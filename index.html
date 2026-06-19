@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Father's Day, Dad!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600&family=Playfair+Display:ital,wght=0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        playfair: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pastel: {
+                            100: '#FFFDF0', // light warm cream/yellow
+                            200: '#FFF9D4', // soft pastel yellow
+                            300: '#FFEFA6', // rich pastel yellow
+                            400: '#F5D547', // accent gold/yellow
+                            800: '#8A6D1C', // dark warm gold
+                        },
+                        sophisticated: {
+                            light: '#FAF8F5',
+                            dark: '#2C2A29',
+                            muted: '#706E6B',
+                            gold: '#C5A059',
+                            goldlight: '#E5C995',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF8F5;
+            background-image: radial-gradient(#FFEFA6 1px, transparent 1px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
+        }
+
+        /* Smooth page/screen transitions */
+        .screen-transition {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        /* Glassmorphism components */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(138, 109, 28, 0.08);
+        }
+
+        /* Polaroid layout */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 28px 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05) !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        /* 3D Envelope and Card Styling */
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background: #FFEFA6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+            perspective: 1000px;
+        }
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid #F5D547;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 30;
+        }
+        .envelope-flap.open {
+            transform: rotateX(180deg);
+            z-index: 10;
+        }
+        .envelope-pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: #FFEFA6;
+            border-top: 1px solid rgba(255,255,255,0.4);
+            z-index: 25;
+            border-radius: 0 0 8px 8px;
+        }
+        .envelope-card {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            width: 290px;
+            height: 190px;
+            background: white;
+            z-index: 20;
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .envelope-card.slid-out {
+            transform: translateY(-160px) scale(1.05);
+            z-index: 40;
+        }
+
+        /* Keypad pulse animation */
+        .keypad-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Floating elements animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        .floating-element-delay {
+            animation: float 6s ease-in-out infinite;
+            animation-delay: 3s;
+        }
+        
+        /* Ribbon style */
+        .corner-ribbon {
+            width: 120px;
+            background: linear-gradient(135deg, #F5D547, #C5A059);
+            color: #2C2A29;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 0;
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Scroll layout inside jar */
+        .scroll-note {
+            background-image: linear-gradient(to right, #FFF9D4 0%, #FFFDF0 8%, #FFFDF0 92%, #FFF9D4 100%);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 text-sophisticated-dark selection:bg-pastel-300">
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="w-full max-w-5xl min-h-[580px] flex items-center justify-center relative">
+
+        <!-- SCREEN 1: START SCREEN -->
+        <div id="screen-start" class="w-full max-w-lg glass-card rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden flex flex-col items-center justify-center py-16">
+            <!-- Decorative Balloons Graphic -->
+            <div class="absolute -top-6 -left-6 floating-element opacity-80">
+                <svg width="100" height="150" viewBox="0 0 100 150">
+                    <defs>
+                        <radialGradient id="balloonGold" cx="50%" cy="30%" r="50%">
+                            <stop offset="0%" stop-color="#FFEFA6" />
+                            <stop offset="70%" stop-color="#F5D547" />
+                            <stop offset="100%" stop-color="#C5A059" />
+                        </radialGradient>
+                    </defs>
+                    <ellipse cx="45" cy="50" rx="30" ry="38" fill="url(#balloonGold)" />
+                    <path d="M45,88 L41,94 L49,94 Z" fill="#C5A059" />
+                    <path d="M45,94 Q40,110 50,130" fill="none" stroke="#C5A059" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="absolute -bottom-8 -right-8 floating-element-delay opacity-85">
+                <svg width="110" height="160" viewBox="0 0 100 150">
+                    <ellipse cx="50" cy="50" rx="32" ry="40" fill="url(#balloonGold)" />
+                    <path d="M50,90 L46,96 L54,96 Z" fill="#C5A059" />
+                    <path d="M50,96 Q55,115 42,135" fill="none" stroke="#C5A059" stroke-width="1.5" />
+                </svg>
+            </div>
+
+            <!-- Soft Elegant Typography Card Layout -->
+            <span class="text-xs uppercase tracking-[0.25em] text-sophisticated-gold font-semibold mb-3 block">A special gift</span>
+            <h1 class="font-playfair text-4xl sm:text-5xl md:text-6xl text-sophisticated-dark font-bold leading-tight mb-6">
+                Happy Father's Day, <span class="relative inline-block"><span class="relative z-10">Dad</span><span class="absolute bottom-1.5 left-0 w-full h-3 bg-pastel-300 -z-10 rounded-full opacity-60"></span></span>
+            </h1>
+            <p class="text-sophisticated-muted text-base sm:text-lg max-w-md mx-auto mb-10 font-light leading-relaxed">
+                Happy Father's Day Dad!! Hope you have the best day ever! Enjoy!
+            </p>
+
+            <button onclick="goToPasscodeScreen()" class="px-8 py-4 bg-gradient-to-r from-pastel-300 to-pastel-400 hover:from-pastel-400 hover:to-pastel-300 text-sophisticated-dark font-medium rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 px-12 tracking-wide font-semibold text-lg">
+                Open
+            </button>
+        </div>
+
+
+        <!-- SCREEN 2: PASSCODE SCREEN (Left: Polaroid, Right: Keypad) -->
+        <div id="screen-passcode" class="w-full hidden grid grid-cols-1 md:grid-cols-12 gap-8 items-center max-w-4xl">
+            <!-- Left Side: Polaroid Frame -->
+            <div class="md:col-span-5 flex flex-col items-center justify-center">
+                <div class="polaroid bg-white w-72 sm:w-80 border border-neutral-100 flex flex-col items-center" style="transform: rotate(-3deg);">
+                    <div class="w-full h-64 overflow-hidden bg-neutral-50 border-b border-neutral-100 relative group">
+                        <!-- Simulated retro image with overlay -->
+                        <img id="polaroidOneImg" src="photos/photo0.jpg" 
+                             alt="Universal Studios Dad, Sarah and Brother" 
+                             class="w-full h-full object-cover transition-all duration-500 hover:scale-105"
+                             onerror="this.src='https://placehold.co/600x600/FFFDF0/8A6D1C?text=Happy+Father%27s+Day'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                    </div>
+                    <div class="pt-6 pb-2 text-center w-full">
+                        <p class="font-playfair text-xl text-sophisticated-dark italic font-semibold">Happy Father's Day</p>
+                        <p class="text-xs text-sophisticated-muted mt-2 tracking-widest uppercase font-semibold">06/21/2026</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Invitation Passcode Keypad -->
+            <div class="md:col-span-7 glass-card rounded-3xl p-8 sm:p-10 flex flex-col justify-between min-h-[460px] relative">
+                <div>
+                    <h2 class="font-playfair text-3xl font-bold text-sophisticated-dark mb-2">Enter a Secret Passcode</h2>
+                    <p class="text-sophisticated-muted text-sm mb-6"><strong class="text-sophisticated-gold font-semibold">Hint: 0621</strong> (Father's Day Date)</p>
+                    
+                    <!-- Code Display dots -->
+                    <div class="flex gap-4 justify-center my-6">
+                        <span id="dot-0" class="w-5 h-5 rounded-full border-2 border-pastel-400 bg-transparent transition-all duration-200"></span>
+                        <span id="dot-1" class="w-5 h-5 rounded-full border-2 border-pastel-400 bg-transparent transition-all duration-200"></span>
+                        <span id="dot-2" class="w-5 h-5 rounded-full border-2 border-pastel-400 bg-transparent transition-all duration-200"></span>
+                        <span id="dot-3" class="w-5 h-5 rounded-full border-2 border-pastel-400 bg-transparent transition-all duration-200"></span>
+                    </div>
+
+                    <div id="passcodeError" class="text-rose-500 text-sm text-center font-medium h-5 opacity-0 transition-opacity duration-200">
+                        Incorrect code. Hint: Try 0621
+                    </div>
+                </div>
+
+                <!-- Touch & Mouse optimized keypad -->
+                <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto w-full mt-4">
+                    <button onclick="pressKey('1')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">1</button>
+                    <button onclick="pressKey('2')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">2</button>
+                    <button onclick="pressKey('3')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">3</button>
+                    
+                    <button onclick="pressKey('4')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">4</button>
+                    <button onclick="pressKey('5')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">5</button>
+                    <button onclick="pressKey('6')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">6</button>
+                    
+                    <button onclick="pressKey('7')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">7</button>
+                    <button onclick="pressKey('8')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">8</button>
+                    <button onclick="pressKey('9')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">9</button>
+                    
+                    <button onclick="clearKeys()" class="keypad-btn py-3.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-medium text-sm transition-all">Clear</button>
+                    <button onclick="pressKey('0')" class="keypad-btn py-3.5 rounded-2xl bg-white border border-pastel-200 hover:bg-pastel-100 font-semibold text-lg text-sophisticated-dark shadow-sm transition-all">0</button>
+                    <button onclick="deleteKey()" class="keypad-btn py-3.5 rounded-2xl bg-neutral-100 hover:bg-neutral-200 text-sophisticated-dark font-medium text-sm transition-all">Delete</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SCREEN 3: GIFTS INTERACTIVE SCREEN -->
+        <div id="screen-gifts" class="w-full hidden flex flex-col items-center">
+            <div class="text-center mb-10 max-w-xl">
+                <span class="text-xs uppercase tracking-widest text-sophisticated-gold font-semibold mb-2 block">You unlocked the gifts!</span>
+                <h2 class="font-playfair text-3xl sm:text-4xl font-bold text-sophisticated-dark">Choose a Gift to Open, Dad!</h2>
+                <p class="text-sophisticated-muted text-sm sm:text-base mt-2">Here are some gifts for you! Click on each gift to see what's inside.</p>
+            </div>
+
+            <!-- Three Gift Boxes Display Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-3xl">
+                
+                <!-- Gift Box 1 -->
+                <button onclick="openGift(1)" id="gift-card-1" class="glass-card rounded-2xl p-6 flex flex-col items-center text-center hover:scale-105 transition-all duration-300 shadow-md border-t-4 border-pastel-400">
+                    <div class="w-32 h-32 flex items-center justify-center relative my-4">
+                        <!-- Custom styled CSS Gift Box 1 -->
+                        <svg viewBox="0 0 100 100" class="w-full h-full floating-element">
+                            <defs>
+                                <linearGradient id="boxGrad1" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#FFEFA6" />
+                                    <stop offset="100%" stop-color="#F5D547" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Lid -->
+                            <rect x="25" y="25" width="50" height="12" rx="3" fill="#C5A059" />
+                            <!-- Body -->
+                            <rect x="28" y="37" width="44" height="38" rx="2" fill="url(#boxGrad1)" />
+                            <!-- Ribbon vertical -->
+                            <rect x="47" y="25" width="6" height="50" fill="#8A6D1C" />
+                            <!-- Ribbon horizontal -->
+                            <rect x="28" y="52" width="44" height="6" fill="#8A6D1C" />
+                            <!-- Bow -->
+                            <path d="M50,25 C45,15 35,20 45,25 C55,25 65,15 50,25 Z" fill="#8A6D1C" />
+                        </svg>
+                        <!-- Opened indicator checkmark -->
+                        <span id="check-gift1" class="absolute top-2 right-2 bg-emerald-500 text-white rounded-full p-1 opacity-0 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                    </div>
+                    <span class="text-xs uppercase tracking-wider text-sophisticated-gold font-semibold">Gift #1</span>
+                    <h3 class="font-playfair text-xl font-bold mt-1 text-sophisticated-dark">Card & Cake</h3>
+                    <p class="text-xs text-sophisticated-muted mt-2">Special Note</p>
+                </button>
+
+                <!-- Gift Box 2 -->
+                <button onclick="openGift(2)" id="gift-card-2" class="glass-card rounded-2xl p-6 flex flex-col items-center text-center hover:scale-105 transition-all duration-300 shadow-md border-t-4 border-amber-300">
+                    <div class="w-32 h-32 flex items-center justify-center relative my-4">
+                        <!-- Custom styled CSS Gift Box 2 -->
+                        <svg viewBox="0 0 100 100" class="w-full h-full floating-element-delay">
+                            <defs>
+                                <linearGradient id="boxGrad2" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#FFDD75" />
+                                    <stop offset="100%" stop-color="#E5C995" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Lid -->
+                            <rect x="25" y="25" width="50" height="12" rx="3" fill="#8A6D1C" />
+                            <!-- Body -->
+                            <rect x="28" y="37" width="44" height="38" rx="2" fill="url(#boxGrad2)" />
+                            <!-- Ribbon vertical -->
+                            <rect x="47" y="25" width="6" height="50" fill="#F5D547" />
+                            <!-- Ribbon horizontal -->
+                            <rect x="28" y="52" width="44" height="6" fill="#F5D547" />
+                            <!-- Bow -->
+                            <path d="M50,25 C45,15 35,20 45,25 C55,25 65,15 50,25 Z" fill="#F5D547" />
+                        </svg>
+                        <!-- Opened indicator checkmark -->
+                        <span id="check-gift2" class="absolute top-2 right-2 bg-emerald-500 text-white rounded-full p-1 opacity-0 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                    </div>
+                    <span class="text-xs uppercase tracking-wider text-sophisticated-gold font-semibold">Gift #2</span>
+                    <h3 class="font-playfair text-xl font-bold mt-1 text-sophisticated-dark">Our Memories</h3>
+                    <p class="text-xs text-sophisticated-muted mt-2">Polaroid Album</p>
+                </button>
+
+                <!-- Gift Box 3 -->
+                <button onclick="openGift(3)" id="gift-card-3" class="glass-card rounded-2xl p-6 flex flex-col items-center text-center hover:scale-105 transition-all duration-300 shadow-md border-t-4 border-amber-200">
+                    <div class="w-32 h-32 flex items-center justify-center relative my-4">
+                        <!-- Custom styled CSS Gift Box 3 -->
+                        <svg viewBox="0 0 100 100" class="w-full h-full floating-element">
+                            <defs>
+                                <linearGradient id="boxGrad3" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#FFFDF0" />
+                                    <stop offset="100%" stop-color="#FFEFA6" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Lid -->
+                            <rect x="25" y="25" width="50" height="12" rx="3" fill="#C5A059" />
+                            <!-- Body -->
+                            <rect x="28" y="37" width="44" height="38" rx="2" fill="url(#boxGrad3)" />
+                            <!-- Ribbon vertical -->
+                            <rect x="47" y="25" width="6" height="50" fill="#F5D547" />
+                            <!-- Ribbon horizontal -->
+                            <rect x="28" y="52" width="44" height="6" fill="#F5D547" />
+                            <!-- Bow -->
+                            <path d="M50,25 C45,15 35,20 45,25 C55,25 65,15 50,25 Z" fill="#F5D547" />
+                        </svg>
+                        <!-- Opened indicator checkmark -->
+                        <span id="check-gift3" class="absolute top-2 right-2 bg-emerald-500 text-white rounded-full p-1 opacity-0 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                    </div>
+                    <span class="text-xs uppercase tracking-wider text-sophisticated-gold font-semibold">Gift #3</span>
+                    <h3 class="font-playfair text-xl font-bold mt-1 text-sophisticated-dark">Messages Jar</h3>
+                    <p class="text-xs text-sophisticated-muted mt-2">Sweet Messages</p>
+                </button>
+
+            </div>
+        </div>
+
+
+        <!-- SCREEN 4: GIFT 1 VIEW (Envelope & Interactive Card) -->
+        <div id="screen-gift1" class="w-full hidden flex flex-col items-center">
+            
+            <!-- BACK BUTTON -->
+            <button onclick="goBackToGifts(1)" class="self-start flex items-center gap-1.5 px-4 py-2 rounded-full glass-card hover:bg-pastel-200 text-sophisticated-dark font-medium text-xs sm:text-sm shadow-sm transition-all mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Back to Gifts
+            </button>
+
+            <!-- ENVELOPE CONTAINER -->
+            <div id="envelopeSection" class="flex flex-col items-center justify-center min-h-[380px]">
+                <p class="text-sm text-sophisticated-muted italic mb-6">Click the envelope to open and reveal your card</p>
+                <div onclick="animateEnvelope()" class="envelope-wrapper cursor-pointer hover:shadow-2xl transition-all duration-300">
+                    <div id="envelopeFlap" class="envelope-flap"></div>
+                    <!-- Internal Card inside Envelope -->
+                    <div id="envelopeCard" class="envelope-card flex flex-col items-center justify-center p-4">
+                        <span class="font-playfair text-lg text-sophisticated-dark italic">To Dad</span>
+                        <div class="w-10 h-[1px] bg-pastel-400 my-1"></div>
+                        <span class="text-[10px] tracking-wider text-sophisticated-muted uppercase">From Sarah</span>
+                    </div>
+                    <div class="envelope-pocket"></div>
+                </div>
+            </div>
+
+            <!-- CARD REVEAL CONTAINER (Initially Hidden) -->
+            <div id="cardSection" class="hidden w-full max-w-lg glass-card rounded-3xl p-8 sm:p-10 relative shadow-2xl overflow-hidden flex flex-col items-center border border-pastel-200">
+                <!-- Ribbon in the corner -->
+                <div class="corner-ribbon font-sans">BEST DAD</div>
+
+                <div class="w-full text-center">
+                    <span class="text-xs uppercase tracking-[0.2em] text-sophisticated-gold font-semibold mb-2 block">Father's Day 2026</span>
+                    <h3 class="font-playfair text-3xl sm:text-4xl font-bold text-sophisticated-dark leading-snug mb-6">Dear Dad,</h3>
+                    
+                    <p class="text-sophisticated-dark text-sm sm:text-base leading-relaxed font-light mb-6 text-justify mx-auto max-w-sm">
+                        Thank you for always being the best dad ever!! From always being there to teach us to helping me control my emotions, you are always someone we can truly rely on. Happy Father's Day!
+                    </p>
+                    
+                    <p class="font-playfair text-xl italic text-sophisticated-gold font-bold mb-4">
+                        Love, Sarah
+                    </p>
+                    <div class="w-16 h-0.5 bg-pastel-300 mx-auto my-6"></div>
+                </div>
+
+                <!-- Interactive Celebration Cake with shading and a blowable candle -->
+                <div class="w-full flex flex-col items-center mt-4">
+                    <p class="text-xs text-sophisticated-muted mb-4 italic" id="candle-instructions">Tap the burning candle to blow it out!</p>
+                    
+                    <div class="relative w-40 h-44 flex flex-col items-center justify-end">
+                        
+                        <!-- Burning Candle & Flame -->
+                        <div id="candleGroup" class="absolute bottom-[80px] z-10 flex flex-col items-center cursor-pointer" onclick="blowCandle()">
+                            <!-- Flame -->
+                            <div id="candleFlame" class="w-3.5 h-6 bg-amber-400 rounded-full blur-[1px] shadow-[0_0_15px_rgba(251,191,36,0.8)] animate-pulse transition-all duration-300 origin-bottom" style="background: radial-gradient(circle, #ffeaa7 10%, #f1c40f 40%, #e67e22 100%);"></div>
+                            <!-- Wick -->
+                            <div class="w-0.5 h-2 bg-neutral-800"></div>
+                            <!-- Wax Candle Body with modern highlights -->
+                            <div class="w-3 h-14 rounded-t-sm" style="background: linear-gradient(90deg, #F5D547, #FFEFA6, #C5A059);"></div>
+                        </div>
+
+                        <!-- 2-Tier Realistic SVG Cake with Shading & Highlights -->
+                        <svg width="150" height="90" viewBox="0 0 150 90" class="drop-shadow-lg">
+                            <defs>
+                                <linearGradient id="cakeCream" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#E5C995" />
+                                    <stop offset="25%" stop-color="#FFF9D4" />
+                                    <stop offset="75%" stop-color="#FFFDF0" />
+                                    <stop offset="100%" stop-color="#C5A059" />
+                                </linearGradient>
+                                <linearGradient id="cakeSponge" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#8A6D1C" />
+                                    <stop offset="20%" stop-color="#FFEFA6" />
+                                    <stop offset="80%" stop-color="#FFF9D4" />
+                                    <stop offset="100%" stop-color="#8A6D1C" />
+                                </linearGradient>
+                                <linearGradient id="frosting" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#FFFDF0" />
+                                    <stop offset="100%" stop-color="#FFEFA6" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Bottom Cake Tier -->
+                            <path d="M 10 50 Q 10 40 25 40 L 125 40 Q 140 40 140 50 L 140 80 Q 140 90 125 90 L 25 90 Q 10 90 10 80 Z" fill="url(#cakeSponge)" />
+                            <!-- Bottom Frosting Layer with Droplets -->
+                            <path d="M 10 50 Q 10 40 25 40 L 125 40 Q 140 40 140 50 Q 140 60 125 60 Q 115 60 110 55 Q 105 50 100 55 Q 90 65 80 55 Q 70 45 60 55 Q 50 65 40 55 Q 30 45 20 55 Q 10 65 10 50 Z" fill="url(#cakeCream)" />
+                            
+                            <!-- Top Cake Tier -->
+                            <path d="M 30 15 Q 30 5 45 5 L 105 5 Q 120 5 120 15 L 120 40 Q 120 45 105 45 L 45 45 Q 30 45 30 40 Z" fill="url(#cakeSponge)" />
+                            <!-- Top Frosting Layer -->
+                            <path d="M 30 15 Q 30 5 45 5 L 105 5 Q 120 5 120 15 Q 120 22 110 22 Q 100 22 95 18 Q 85 10 75 18 Q 65 26 55 18 Q 45 10 35 18 Q 30 22 30 15 Z" fill="url(#cakeCream)" />
+
+                            <!-- Birthday Cake Toppings (Berries) -->
+                            <circle cx="50" cy="5" r="4" fill="#C5A059" />
+                            <circle cx="75" cy="5" r="4.5" fill="#8A6D1C" />
+                            <circle cx="100" cy="5" r="4" fill="#C5A059" />
+                        </svg>
+                    </div>
+
+                    <!-- Post-candle wish message -->
+                    <div id="wishMessage" class="hidden text-center mt-6 text-emerald-600 font-medium text-base animate-bounce">
+                        ✨ Happy Father's Day! ✨
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- SCREEN 5: GIFT 2 VIEW (Polaroid Photo Memories Album) -->
+        <div id="screen-gift2" class="w-full hidden flex flex-col items-center">
+            
+            <button onclick="goBackToGifts(2)" class="self-start flex items-center gap-1.5 px-4 py-2 rounded-full glass-card hover:bg-pastel-200 text-sophisticated-dark font-medium text-xs sm:text-sm shadow-sm transition-all mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Back to Gifts
+            </button>
+
+            <div class="text-center mb-10 max-w-xl">
+                <span class="text-xs uppercase tracking-widest text-sophisticated-gold font-semibold mb-2 block">Our Precious Memories</span>
+                <h3 class="font-playfair text-3xl font-bold text-sophisticated-dark">Polaroid Memory Album</h3>
+                <p class="text-sophisticated-muted text-xs sm:text-sm mt-2">Some of my absolute favourite memories!</p>
+            </div>
+
+            <!-- Polaroid Grid Layout (All 4 custom photo uploads) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-center w-full max-w-5xl px-4">
+                
+                <!-- Polaroid Photo 1 -->
+                <div class="polaroid bg-white border border-neutral-100 flex flex-col items-center mx-auto w-full max-w-[240px]" style="transform: rotate(-2.5deg);">
+                    <div class="w-full h-52 overflow-hidden bg-neutral-100 border-b border-neutral-100 relative">
+                        <img src="photos/photo0.jpg" 
+                             alt="Universal Studios" 
+                             class="w-full h-full object-cover transition-all duration-500"
+                             onerror="this.src='https://placehold.co/600x400/FFEFA6/2C2A29?text=Universal+Studios'">
+                    </div>
+                    <div class="pt-4 pb-1 text-center px-2">
+                        <p class="font-playfair text-sm text-sophisticated-dark italic font-semibold">"Universal!"</p>
+                        <p class="text-[9px] text-sophisticated-muted mt-1 tracking-widest uppercase">Orlando</p>
+                    </div>
+                </div>
+
+                <!-- Polaroid Photo 2 -->
+                <div class="polaroid bg-white border border-neutral-100 flex flex-col items-center mx-auto w-full max-w-[240px]" style="transform: rotate(3deg);">
+                    <div class="w-full h-52 overflow-hidden bg-neutral-100 border-b border-neutral-100 relative">
+                        <img src="photos/photo1.jpg" 
+                             alt="Oyster Dinner" 
+                             class="w-full h-full object-cover transition-all duration-500"
+                             onerror="this.src='https://placehold.co/600x400/FFEFA6/2C2A29?text=Oyster+Dinner'">
+                    </div>
+                    <div class="pt-4 pb-1 text-center px-2">
+                        <p class="font-playfair text-sm text-sophisticated-dark italic font-semibold">"Captain's Boil 🦪"</p>
+                        <p class="text-[9px] text-sophisticated-muted mt-1 tracking-widest uppercase">Tasty!</p>
+                    </div>
+                </div>
+
+                <!-- Polaroid Photo 3 -->
+                <div class="polaroid bg-white border border-neutral-100 flex flex-col items-center mx-auto w-full max-w-[240px]" style="transform: rotate(-1.5deg);">
+                    <div class="w-full h-52 overflow-hidden bg-neutral-100 border-b border-neutral-100 relative">
+                        <img src="photos/photo2.jpg" 
+                             alt="Outdoors Nature Walk" 
+                             class="w-full h-full object-cover transition-all duration-500"
+                             onerror="this.src='https://placehold.co/600x400/FFEFA6/2C2A29?text=Nature+Walk'">
+                    </div>
+                    <div class="pt-4 pb-1 text-center px-2">
+                        <p class="font-playfair text-sm text-sophisticated-dark italic font-semibold">"Outdoor Photo"</p>
+                        <p class="text-[9px] text-sophisticated-muted mt-1 tracking-widest uppercase">Yay</p>
+                    </div>
+                </div>
+
+                <!-- Polaroid Photo 4 -->
+                <div class="polaroid bg-white border border-neutral-100 flex flex-col items-center mx-auto w-full max-w-[240px]" style="transform: rotate(2deg);">
+                    <div class="w-full h-52 overflow-hidden bg-neutral-100 border-b border-neutral-100 relative">
+                        <img src="photos/photo3.jpg" 
+                             alt="Blue Jays Game" 
+                             class="w-full h-full object-cover transition-all duration-500"
+                             onerror="this.src='https://placehold.co/600x400/FFEFA6/2C2A29?text=Blue+Jays+Game'">
+                    </div>
+                    <div class="pt-4 pb-1 text-center px-2">
+                        <p class="font-playfair text-sm text-sophisticated-dark italic font-semibold">"Let's go Blue Jays! ⚾"</p>
+                        <p class="text-[9px] text-sophisticated-muted mt-1 tracking-widest uppercase">World Series Game 1</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Helpful tip -->
+            <p class="text-xs text-sophisticated-muted mt-12 text-center max-w-sm">Hover over or tap on polaroids to bring back full colors and zoom into our memories.</p>
+        </div>
+
+
+        <!-- SCREEN 6: GIFT 3 VIEW (Jar of Heartfelt Message Scrolls) -->
+        <div id="screen-gift3" class="w-full hidden flex flex-col items-center">
+            
+            <button onclick="goBackToGifts(3)" class="self-start flex items-center gap-1.5 px-4 py-2 rounded-full glass-card hover:bg-pastel-200 text-sophisticated-dark font-medium text-xs sm:text-sm shadow-sm transition-all mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                Back to Gifts
+            </button>
+
+            <div class="text-center mb-8 max-w-xl">
+                <span class="text-xs uppercase tracking-widest text-sophisticated-gold font-semibold mb-2 block">Thoughtful Reminders</span>
+                <h3 class="font-playfair text-3xl font-bold text-sophisticated-dark">Jar of Warm Messages</h3>
+                <p class="text-sophisticated-muted text-xs sm:text-sm mt-2">This magic jar is stuffed with messages. Reach inside to read one!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center justify-center w-full max-w-3xl">
+                <!-- Left: Interactive Glass Jar (HTML/CSS glassmorphism) -->
+                <div class="md:col-span-5 flex flex-col items-center">
+                    <div onclick="drawMessageFromJar()" class="relative w-48 h-64 cursor-pointer group flex items-center justify-center">
+                        <!-- Jar lid -->
+                        <div class="absolute top-0 w-24 h-6 rounded-md bg-gradient-to-r from-pastel-400 to-sophisticated-gold shadow-md z-30 transition-transform group-hover:-translate-y-1"></div>
+                        <!-- Jar Neck -->
+                        <div class="absolute top-5 w-20 h-4 bg-white/40 border-l border-r border-white/60 z-20"></div>
+                        
+                        <!-- Jar Main Glass Body -->
+                        <div class="absolute bottom-0 w-44 h-56 rounded-t-3xl rounded-b-[40px] border border-white/80 glass-card bg-white/10 shadow-[inset_0_4px_20px_rgba(255,255,255,0.6),0_15px_30px_rgba(138,109,28,0.15)] flex flex-wrap items-center justify-center p-4 gap-2 overflow-hidden z-10 transition-all duration-300 group-hover:scale-[1.03]">
+                            <!-- Scroll indicators visible inside jar -->
+                            <div class="w-7 h-3 bg-pastel-300/80 rounded-full border border-pastel-400 rotate-12 shadow-sm"></div>
+                            <div class="w-8 h-3.5 bg-amber-200/90 rounded-full border border-amber-300 -rotate-[15deg] shadow-sm"></div>
+                            <div class="w-7 h-3.5 bg-pastel-200/80 rounded-full border border-pastel-300 rotate-[45deg] shadow-sm"></div>
+                            <div class="w-9 h-3 bg-amber-100/75 rounded-full border border-amber-200 -rotate-45 shadow-sm"></div>
+                            <div class="w-8 h-3 bg-pastel-300/85 rounded-full border border-pastel-400 rotate-[70deg] shadow-sm"></div>
+                            <div class="w-7 h-3 bg-amber-300/80 rounded-full border border-amber-400 -rotate-12 shadow-sm"></div>
+                        </div>
+
+                        <!-- Sparkles on hover -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
+                            <span class="text-2xl text-pastel-400 animate-ping absolute -top-2 left-6">✨</span>
+                            <span class="text-xl text-pastel-400 animate-pulse absolute bottom-4 right-6">✨</span>
+                        </div>
+                    </div>
+                    <span class="text-xs text-sophisticated-muted italic mt-4 text-center">Click the jar to pull out a scroll!</span>
+                </div>
+
+                <!-- Right: Pulled Note Display -->
+                <div class="md:col-span-7 flex flex-col items-center">
+                    <div id="scrollContainer" class="w-full min-h-[180px] flex items-center justify-center p-2">
+                        <!-- Placeholder Card prior to pulling -->
+                        <div id="scrollPlaceholder" class="text-center p-8 border border-dashed border-pastel-400/40 rounded-2xl w-full bg-pastel-100/40">
+                            <p class="text-sm text-sophisticated-muted">Your message will reveal itself here...</p>
+                        </div>
+
+                        <!-- Actual Display Card -->
+                        <div id="scrollContent" class="hidden w-full scroll-note p-8 rounded-2xl border border-pastel-300 transition-all duration-500 scale-95 opacity-0 flex flex-col items-center text-center relative">
+                            <!-- Elegant ribbon inside note -->
+                            <div class="absolute top-2 left-2 text-xs">📜</div>
+                            
+                            <h4 class="font-playfair text-xl font-bold text-sophisticated-dark mb-4" id="noteTitle">Sarah says...</h4>
+                            <p class="text-sophisticated-dark text-sm sm:text-base italic leading-relaxed font-light mb-4" id="noteBody">
+                                "Thanks for being the GDOAT 🐐 (greatest dad of all time!)"
+                            </p>
+                            <div class="w-10 h-[1px] bg-sophisticated-gold/50 my-2"></div>
+                            <span class="text-[10px] tracking-wider text-sophisticated-muted uppercase font-medium">Pulled with love</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-12 text-center text-[11px] text-sophisticated-muted tracking-widest uppercase">
+        Created by Sarah • 2026
+    </footer>
+
+    <script>
+        // Global State Variables
+        let enteredCode = [];
+        const correctPasscode = ['0', '6', '2', '1'];
+        let giftsOpenedState = {
+            1: false,
+            2: false,
+            3: false
+        };
+
+        // Navigation state transition handler
+        function changeScreen(fromId, toId) {
+            const from = document.getElementById(fromId);
+            const to = document.getElementById(toId);
+            
+            from.classList.add('opacity-0');
+            setTimeout(() => {
+                from.classList.add('hidden');
+                to.classList.remove('hidden');
+                to.classList.add('opacity-0');
+                // Force layout reflow
+                to.offsetHeight; 
+                to.classList.remove('opacity-0');
+            }, 300);
+        }
+
+        // Go to Passcode Enter Page
+        function goToPasscodeScreen() {
+            changeScreen('screen-start', 'screen-passcode');
+        }
+
+        // Touch Keypad Handling
+        function pressKey(number) {
+            if (enteredCode.length >= 4) return;
+            enteredCode.push(number);
+            updatePasscodeDots();
+            
+            if (enteredCode.length === 4) {
+                verifyPasscode();
+            }
+        }
+
+        // Deleting/clearing keypad inputs
+        function deleteKey() {
+            enteredCode.pop();
+            updatePasscodeDots();
+        }
+
+        function clearKeys() {
+            enteredCode = [];
+            updatePasscodeDots();
+            document.getElementById('passcodeError').classList.add('opacity-0');
+        }
+
+        function updatePasscodeDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < enteredCode.length) {
+                    dot.classList.remove('bg-transparent');
+                    dot.classList.add('bg-pastel-400');
+                } else {
+                    dot.classList.remove('bg-pastel-400');
+                    dot.classList.add('bg-transparent');
+                }
+            }
+        }
+
+        // Verify secret keypad pattern
+        function verifyPasscode() {
+            const codeString = enteredCode.join('');
+            if (codeString === correctPasscode.join('')) {
+                // SUCCESS: celebratory confetti trigger
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#F5D547', '#FFEFA6', '#C5A059', '#FFFFFF']
+                });
+                
+                setTimeout(() => {
+                    changeScreen('screen-passcode', 'screen-gifts');
+                }, 800);
+            } else {
+                // FAIL
+                document.getElementById('passcodeError').classList.remove('opacity-0');
+                
+                // Shake effect fallback
+                const keypadWrap = document.getElementById('screen-passcode');
+                keypadWrap.classList.add('animate-bounce');
+                setTimeout(() => {
+                    keypadWrap.classList.remove('animate-bounce');
+                }, 500);
+
+                setTimeout(() => {
+                    clearKeys();
+                }, 1000);
+            }
+        }
+
+        // Main Gifts Navigation Logic
+        function openGift(id) {
+            giftsOpenedState[id] = true;
+            document.getElementById(`check-gift${id}`).classList.remove('opacity-0');
+            
+            setTimeout(() => {
+                changeScreen('screen-gifts', `screen-gift${id}`);
+                // Reset Jar view state on open
+                if (id === 3) {
+                    document.getElementById('scrollContent').classList.add('hidden');
+                    document.getElementById('scrollPlaceholder').classList.remove('hidden');
+                }
+            }, 250);
+        }
+
+        function goBackToGifts(giftNumber) {
+            changeScreen(`screen-gift${giftNumber}`, 'screen-gifts');
+        }
+
+
+        // Gift 1: Envelope Slid-out Animation triggers
+        function animateEnvelope() {
+            const flap = document.getElementById('envelopeFlap');
+            const card = document.getElementById('envelopeCard');
+            
+            // Flip open the gold flap envelope geometry
+            flap.classList.add('open');
+            
+            // Slide the digital letter card upwards
+            setTimeout(() => {
+                card.classList.add('slid-out');
+            }, 600);
+
+            // Transition to detailed view displaying realistic cake
+            setTimeout(() => {
+                document.getElementById('envelopeSection').classList.add('hidden');
+                document.getElementById('cardSection').classList.remove('hidden');
+                confetti({
+                    particleCount: 40,
+                    spread: 50,
+                    origin: { y: 0.8 }
+                });
+            }, 1600);
+        }
+
+        // Interactive Cake Candle "blowing" action
+        function blowCandle() {
+            const flame = document.getElementById('candleFlame');
+            flame.style.transform = 'scale(0)';
+            flame.style.opacity = '0';
+            
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.7 },
+                colors: ['#FFF', '#F5D547', '#C5A059']
+            });
+
+            document.getElementById('candle-instructions').classList.add('hidden');
+            document.getElementById('wishMessage').classList.remove('hidden');
+        }
+
+
+        // Message Scrolls Data from Sarah
+        const messagesFromSarah = [
+            "Thanks for being a mentor to us always! 🧠",
+            "We will love you forever! ❤️",
+            "Sarah the squirrel says 'Happy Father's Day' 🐿️",
+            "Yayayay Happy Father's Day! 👔",
+            "Thanks for being the best Dad ever! 🏆",
+            "Thanks for being the GDOAT 🐐 (greatest dad of all time!)"
+        ];
+
+        let previousIndex = -1;
+
+        // Message jar drawing logic
+        function drawMessageFromJar() {
+            let randomIndex = Math.floor(Math.random() * messagesFromSarah.length);
+            while (randomIndex === previousIndex) {
+                randomIndex = Math.floor(Math.random() * messagesFromSarah.length);
+            }
+            previousIndex = randomIndex;
+
+            const selectedMsg = messagesFromSarah[randomIndex];
+            
+            const placeholder = document.getElementById('scrollPlaceholder');
+            const noteCard = document.getElementById('scrollContent');
+            const noteBody = document.getElementById('noteBody');
+
+            noteCard.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                placeholder.classList.add('hidden');
+                noteCard.classList.remove('hidden');
+                
+                noteBody.innerText = `"${selectedMsg}"`;
+                
+                setTimeout(() => {
+                    noteCard.classList.remove('scale-95', 'opacity-0');
+                }, 50);
+
+                confetti({
+                    particleCount: 15,
+                    angle: 60,
+                    spread: 45,
+                    origin: { x: 0.3 }
+                });
+            }, 300);
+        }
+
+    </script>
+</body>
+</html>
