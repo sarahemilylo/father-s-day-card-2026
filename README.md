@@ -10,6 +10,8 @@ An interactive, elegant digital Father's Day celebration card website created by
 
 This project is a single-page web application featuring high-quality customized animations, interactive gifts, personal photo memories, and randomized message scrolls designed to celebrate Father's Day in a modern, sophisticated style.
 
+<img width="2858" height="1450" alt="image" src="https://github.com/user-attachments/assets/4ac0df56-6eb3-401a-afcf-afbf29a129d0" />
+
 ---
 
 ## ✨ Features
